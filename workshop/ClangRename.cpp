@@ -22,31 +22,55 @@ using namespace clang::ast_matchers;
 using namespace clang::tooling;
 using namespace llvm;
 
+cl::opt<std::string> From(cl::Positional, cl::desc("<from>"));
+
+cl::opt<std::string> To(cl::Positional, cl::desc("<to>"));
+
 namespace {
 class RenameCallback : public MatchFinder::MatchCallback {
 public:
   RenameCallback(Replacements *Replace) : Replace(Replace) {}
 
-  virtual void run(const MatchFinder::MatchResult &Result) {}
+  virtual void run(const MatchFinder::MatchResult &Result) {
+    const TypeLoc *Loc = Result.Nodes.getNodeAs<TypeLoc>("loc");
+    if (Loc != NULL) {
+    Replace->insert(Replacement(*Result.SourceManager, Loc, To));
+    return;
+    }
+    const NamedDecl *Decl = Result.Nodes.getNodeAs<NamedDecl>("decl");
+    if (Decl != NULL) {
+      CharSourceRange Range = CharSourceRange::getTokenRange(
+          Decl->getLocation(), Decl->getLocation());
+      Replace->insert(Replacement(*Result.SourceManager, Range, To));
+      return;
+    }
+    const DeclRefExpr *Ref = Result.Nodes.getNodeAs<DeclRefExpr>("ref");
+    assert(Ref != NULL);
+    Replace->insert(Replacement(*Result.SourceManager, Ref, To));
+  }
 
 private:
   Replacements *Replace;
 };
 } // end anonymous namespace
 
-cl::opt<std::string> From(
-  cl::Positional,
-  cl::desc("<from>"));
-
-cl::opt<std::string> To(
-  cl::Positional,
-  cl::desc("<to>"));
-
 int main(int argc, const char **argv) {
   CommonOptionsParser OptionsParser(argc, argv);
   RefactoringTool Tool(OptionsParser.getCompilations(),
                        OptionsParser.getSourcePathList());
 
-  return Tool.runAndSave(NULL);
+  MatchFinder Finder;
+  RenameCallback Callback(&Tool.getReplacements());
+  Finder.addMatcher(
+      loc(qualType(unless(elaboratedType()),
+                   hasDeclaration(namedDecl(hasName(From))))).bind("loc"),
+      &Callback);
+  Finder.addMatcher(namedDecl(hasName(From)).bind("decl"),
+                    &Callback);
+  Finder.addMatcher(
+      declRefExpr(hasDeclaration(namedDecl(hasName(From)))).bind("ref"),
+      &Callback);
+
+  return Tool.runAndSave(newFrontendActionFactory(&Finder));
 }
 
