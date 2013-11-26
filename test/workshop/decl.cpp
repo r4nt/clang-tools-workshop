@@ -2,6 +2,7 @@
 // RUN: clang-rename foo bar %t.cpp --
 // RUN: FileCheck %s < %t.cpp
 
+// CHECK: class bar {};
 class foo {};
 
 // CHECK: bar f;
@@ -13,6 +14,7 @@ class zoo {};
 zoo z;
 
 namespace a {
+// CHECK: class bar {};
 class foo {};
 }
 

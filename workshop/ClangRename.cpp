@@ -34,8 +34,15 @@ public:
 
   virtual void run(const MatchFinder::MatchResult &Result) {
     const TypeLoc *Loc = Result.Nodes.getNodeAs<TypeLoc>("loc");
-    assert(Loc != NULL);
-    Replace->insert(Replacement(*Result.SourceManager, Loc, To));
+    if (Loc != NULL) {
+      Replace->insert(Replacement(*Result.SourceManager, Loc, To));
+      return;
+    }
+    const NamedDecl *Decl = Result.Nodes.getNodeAs<NamedDecl>("decl");
+    assert(Decl != NULL);
+    CharSourceRange Range(CharSourceRange::getTokenRange(Decl->getLocation(),
+                                                         Decl->getLocation()));
+    Replace->insert(Replacement(*Result.SourceManager, Range, To));
   }
 
 private:
@@ -54,6 +61,7 @@ int main(int argc, const char **argv) {
       loc(qualType(unless(elaboratedType()),
                    hasDeclaration(namedDecl(hasName(From))))).bind("loc"),
       &Callback);
+  Finder.addMatcher(namedDecl(hasName(From)).bind("decl"), &Callback);
 
   return Tool.runAndSave(newFrontendActionFactory(&Finder));
 }
