@@ -6,3 +6,9 @@ class foo {};
 
 // CHECK: bar f;
 foo f;
+
+class zoo {};
+
+// CHECK: zoo z;
+zoo z;
+
