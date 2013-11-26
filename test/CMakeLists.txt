@@ -30,6 +30,7 @@ set(CLANG_TOOLS_TEST_DEPS
   clang-apply-replacements
   clang-modernize
   clang-tidy
+  clang-rename
   modularize
   pp-trace
   remove-cstr-calls
