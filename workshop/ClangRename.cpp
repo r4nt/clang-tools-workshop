@@ -46,7 +46,8 @@ public:
     }
     const DeclRefExpr *Ref = Result.Nodes.getNodeAs<DeclRefExpr>("ref");
     assert(Ref != NULL);
-    Replace->insert(Replacement(*Result.SourceManager, Ref, To));
+    DeclarationNameInfo NameInfo = Ref->getNameInfo();
+    Replace->insert(Replacement(*Result.SourceManager, &NameInfo, To));
   }
 
 private:

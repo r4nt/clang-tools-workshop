@@ -32,3 +32,11 @@ void func(int foo) {
   // CHECK: int i = bar;
   int i = foo;
 }
+
+struct A {
+  // CHECK: static int bar;
+  static int foo;
+};
+
+// CHECK: int j = A::bar;
+int j = A::foo;
