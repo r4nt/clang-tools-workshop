@@ -51,7 +51,8 @@ int main(int argc, const char **argv) {
   MatchFinder Finder;
   RenameCallback Callback(&Tool.getReplacements());
   Finder.addMatcher(
-      loc(qualType(hasDeclaration(namedDecl(hasName(From))))).bind("loc"),
+      loc(qualType(unless(elaboratedType()),
+                   hasDeclaration(namedDecl(hasName(From))))).bind("loc"),
       &Callback);
 
   return Tool.runAndSave(newFrontendActionFactory(&Finder));
