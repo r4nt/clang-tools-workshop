@@ -39,10 +39,16 @@ public:
       return;
     }
     const NamedDecl *Decl = Result.Nodes.getNodeAs<NamedDecl>("decl");
-    assert(Decl != NULL);
-    CharSourceRange Range(CharSourceRange::getTokenRange(Decl->getLocation(),
-                                                         Decl->getLocation()));
-    Replace->insert(Replacement(*Result.SourceManager, Range, To));
+    if (Decl != NULL) {
+      CharSourceRange Range(CharSourceRange::getTokenRange(
+          Decl->getLocation(), Decl->getLocation()));
+      Replace->insert(Replacement(*Result.SourceManager, Range, To));
+      return;
+    }
+    const DeclRefExpr *Ref = Result.Nodes.getNodeAs<DeclRefExpr>("ref");
+    assert(Ref != NULL);
+    DeclarationNameInfo NameInfo(Ref->getNameInfo());
+    Replace->insert(Replacement(*Result.SourceManager, &NameInfo, To));
   }
 
 private:
@@ -62,6 +68,9 @@ int main(int argc, const char **argv) {
                    hasDeclaration(namedDecl(hasName(From))))).bind("loc"),
       &Callback);
   Finder.addMatcher(namedDecl(hasName(From)).bind("decl"), &Callback);
+  Finder.addMatcher(
+      declRefExpr(hasDeclaration(namedDecl(hasName(From)))).bind("ref"),
+      &Callback);
 
   return Tool.runAndSave(newFrontendActionFactory(&Finder));
 }
