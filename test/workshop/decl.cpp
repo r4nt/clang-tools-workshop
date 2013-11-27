@@ -13,6 +13,18 @@ class foz {};
 // CHECK: foz g;
 foz g;
 
+#define M(x) x
+// CHECK: M(bar) k;
+M(foo) k;
+
+// CHECK: #define N(y) bar y;
+#define N(y) foo y;
+N(m);
+
+template<typename T> class Y {};
+// CHECK: Y<bar> l;
+Y<foo> l;
+
 namespace a {
   // CHECK: class bar {};
   class foo {};
@@ -21,8 +33,8 @@ namespace a {
 // CHECK: a::bar h;
 a::foo h;
 
-// CHECK: int bar;
-int foo;
+// CHECK: const int bar = 42;
+const int foo = 42;
 
 // CHECK: int i = bar;
 int i = foo;
@@ -51,3 +63,7 @@ void foo() {
   this->foo();
 }
 };
+
+template<int> class Z {};
+// CHECK: Z<bar> z;
+Z<foo> z;
