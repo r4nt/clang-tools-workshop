@@ -45,8 +45,13 @@ public:
       return;
     }
     const DeclRefExpr *Ref = Result.Nodes.getNodeAs<DeclRefExpr>("ref");
-    assert(Ref != NULL);
-    DeclarationNameInfo NameInfo = Ref->getNameInfo();
+    if (Ref != NULL) {
+      DeclarationNameInfo NameInfo = Ref->getNameInfo();
+      Replace->insert(Replacement(*Result.SourceManager, &NameInfo, To));
+      return;
+    }
+    const MemberExpr *Member = Result.Nodes.getNodeAs<MemberExpr>("member");
+    DeclarationNameInfo NameInfo = Member->getMemberNameInfo();
     Replace->insert(Replacement(*Result.SourceManager, &NameInfo, To));
   }
 
@@ -70,6 +75,9 @@ int main(int argc, const char **argv) {
                     &Callback);
   Finder.addMatcher(
       declRefExpr(hasDeclaration(namedDecl(hasName(From)))).bind("ref"),
+      &Callback);
+  Finder.addMatcher(
+      memberExpr(hasDeclaration(namedDecl(hasName(From)))).bind("member"),
       &Callback);
 
   return Tool.runAndSave(newFrontendActionFactory(&Finder));

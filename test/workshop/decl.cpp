@@ -40,3 +40,14 @@ struct A {
 
 // CHECK: int j = A::bar;
 int j = A::foo;
+
+class C {
+// CHECK: void bar() {
+void foo() {
+  // CHECK: bar();
+  foo();
+
+  // CHECK: this->bar();
+  this->foo();
+}
+};
