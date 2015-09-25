@@ -13,6 +13,7 @@
 #include "ArgumentCommentCheck.h"
 #include "AssertSideEffectCheck.h"
 #include "AssignOperatorSignatureCheck.h"
+#include "AwesomeFunctionsCheck.h"
 #include "BoolPointerImplicitConversionCheck.h"
 #include "InaccurateEraseCheck.h"
 #include "InefficientAlgorithmCheck.h"
@@ -41,6 +42,8 @@ public:
         "misc-assert-side-effect");
     CheckFactories.registerCheck<AssignOperatorSignatureCheck>(
         "misc-assign-operator-signature");
+    CheckFactories.registerCheck<AwesomeFunctionsCheck>(
+        "misc-awesome-functions");
     CheckFactories.registerCheck<BoolPointerImplicitConversionCheck>(
         "misc-bool-pointer-implicit-conversion");
     CheckFactories.registerCheck<InaccurateEraseCheck>(

@@ -24,6 +24,7 @@ List of clang-tidy Checks
    misc-argument-comment
    misc-assert-side-effect
    misc-assign-operator-signature
+   misc-awesome-functions
    misc-bool-pointer-implicit-conversion
    misc-inaccurate-erase
    misc-inefficient-algorithm
