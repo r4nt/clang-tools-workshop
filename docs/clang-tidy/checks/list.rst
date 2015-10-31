@@ -62,6 +62,7 @@ List of clang-tidy Checks
    modernize-use-override
    readability-braces-around-statements
    readability-container-size-empty
+   readability-early-exit
    readability-else-after-return
    readability-function-size
    readability-identifier-naming

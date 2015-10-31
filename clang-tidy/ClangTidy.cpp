@@ -142,11 +142,11 @@ public:
 
   void Finish() {
     // FIXME: Run clang-format on changes.
-    if (ApplyFixes && TotalFixes > 0) {
-      llvm::errs() << "clang-tidy applied " << AppliedFixes << " of "
-                   << TotalFixes << " suggested fixes.\n";
-      Rewrite.overwriteChangedFiles();
-    }
+    if (!(ApplyFixes && TotalFixes > 0))
+      return;
+    llvm::errs() << "clang-tidy applied " << AppliedFixes << " of "
+                 << TotalFixes << " suggested fixes.\n";
+    Rewrite.overwriteChangedFiles();
   }
 
 private:
